@@ -3,6 +3,8 @@ package DatabaseManagementSystem.termproject.user;
 import DatabaseManagementSystem.termproject.core.enums.Gender;
 import DatabaseManagementSystem.termproject.core.enums.Profession;
 import DatabaseManagementSystem.termproject.core.enums.Role;
+import DatabaseManagementSystem.termproject.entities.Thesis;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -50,6 +52,14 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "author")
+    @JsonIgnore
+    private List<Thesis> thesis;
+
+    @ManyToMany(mappedBy = "supervisors")
+    @JsonBackReference
+    private List<Thesis> thesisList;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -39,7 +39,7 @@ public class AuthenticationService {
         try {
             profession = Profession.valueOf(request.getProfession().toUpperCase());
         } catch (Exception e) {
-            profession = Profession.NotDefined;
+            profession = Profession.NOT_DEFINED;
         }
         try {
             gender = Gender.valueOf(request.getGender().toUpperCase());

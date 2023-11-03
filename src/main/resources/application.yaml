@@ -20,6 +20,11 @@ spring:
     property-naming-strategy: SNAKE_CASE
 
 application:
+
+  utils:
+    time-service:
+      zone: Europe/Istanbul
+
   security:
     jwt:
       secret-key: b0982c7360d5600030de94c0bb609ce9808a8a56227f2c94211e9d727d20342a

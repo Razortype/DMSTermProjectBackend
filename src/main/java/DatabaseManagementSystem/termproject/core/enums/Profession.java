@@ -1,11 +1,11 @@
 package DatabaseManagementSystem.termproject.core.enums;
 
 public enum Profession {
-    NotDefined,
-    Student,
-    Professor,
-    Researcher,
-    Tutor,
-    TeachingAssistant,
-    Specialist
+    NOT_DEFINED,
+    STUDENT,
+    PROFESSOR,
+    RESEARCHER,
+    TUTOR,
+    TEACHING_ASSISTANT,
+    SPECIALIST
 }
