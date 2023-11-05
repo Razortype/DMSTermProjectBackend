@@ -54,6 +54,7 @@ public class ThesisController {
         return ResponseEntity.ok(result);
     }
 
+    /*
     @PutMapping("/{thesis_id}/add/{user_id}")
     public ResponseEntity<Result> addSupervisorToThesis(
             @PathVariable(name="thesis_id") int thesisId,
@@ -77,5 +78,6 @@ public class ThesisController {
         }
         return ResponseEntity.ok(result);
     }
+    */
 
 }

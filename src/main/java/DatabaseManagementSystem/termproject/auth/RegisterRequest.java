@@ -1,5 +1,6 @@
 package DatabaseManagementSystem.termproject.auth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,8 +16,10 @@ public class RegisterRequest {
     private String lastname;
     private String email;
     private String password;
-    private int age;
+    @JsonProperty("birth_year")
+    private int birthYear;
     private String gender;
-    private String profession;
+    @JsonProperty("profession_id")
+    private int professionId;
 
 }

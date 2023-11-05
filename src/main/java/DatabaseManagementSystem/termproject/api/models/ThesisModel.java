@@ -1,6 +1,7 @@
 package DatabaseManagementSystem.termproject.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +31,16 @@ public class ThesisModel {
     @JsonProperty("related_keywords")
     private String relatedKeywords;
 
-    private String type;
-    private String language;
+    @Column(name = "type_id")
+    private int typeId;
+
+    @Column(name = "language_id")
+    private int languageId;
+
+    @Column(name = "supervisor_id")
+    private int supervisorId;
+
+    @Column(name = "co_supervisor_id")
+    private int coSupervisorId;
 
 }

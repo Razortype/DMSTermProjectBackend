@@ -1,11 +1,13 @@
 package DatabaseManagementSystem.termproject.auth;
 
+import DatabaseManagementSystem.termproject.business.abstracts.ProfessionService;
 import DatabaseManagementSystem.termproject.config.CookieService;
 import DatabaseManagementSystem.termproject.config.JwtService;
 import DatabaseManagementSystem.termproject.core.enums.Gender;
-import DatabaseManagementSystem.termproject.core.enums.Profession;
 import DatabaseManagementSystem.termproject.core.enums.Role;
 import DatabaseManagementSystem.termproject.core.enums.TokenType;
+import DatabaseManagementSystem.termproject.core.utils.results.DataResult;
+import DatabaseManagementSystem.termproject.entities.Profession;
 import DatabaseManagementSystem.termproject.token.Token;
 import DatabaseManagementSystem.termproject.token.TokenRepository;
 import DatabaseManagementSystem.termproject.user.User;
@@ -32,15 +34,15 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final CookieService cookieService;
+    private final ProfessionService professionService;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        Profession profession;
-        Gender gender;
-        try {
-            profession = Profession.valueOf(request.getProfession().toUpperCase());
-        } catch (Exception e) {
-            profession = Profession.NOT_DEFINED;
+        DataResult result = professionService.getById(request.getProfessionId());
+        if (!result.isSuccess()) {
+            throw new RuntimeException(result.getMessage());
         }
+
+        Gender gender;
         try {
             gender = Gender.valueOf(request.getGender().toUpperCase());
         } catch (Exception e) {
@@ -53,8 +55,8 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .gender(gender)
-                .age(request.getAge())
-                .profession(profession)
+                .birthYear(request.getBirthYear())
+                .profession((Profession) result.getData())
                 .role(Role.USER)
                 .build();
         var savedUser = userRepository.save(user);

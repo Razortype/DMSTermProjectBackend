@@ -1,13 +1,15 @@
 package DatabaseManagementSystem.termproject.business.concretes;
 
 import DatabaseManagementSystem.termproject.api.models.ThesisModel;
+import DatabaseManagementSystem.termproject.business.abstracts.ThesisLanguageService;
 import DatabaseManagementSystem.termproject.business.abstracts.ThesisService;
+import DatabaseManagementSystem.termproject.business.abstracts.ThesisTypeService;
 import DatabaseManagementSystem.termproject.business.abstracts.UserService;
-import DatabaseManagementSystem.termproject.core.enums.TextLanguage;
-import DatabaseManagementSystem.termproject.core.enums.ThesisType;
 import DatabaseManagementSystem.termproject.core.utils.results.*;
 import DatabaseManagementSystem.termproject.dataAccess.ThesisRepository;
 import DatabaseManagementSystem.termproject.entities.Thesis;
+import DatabaseManagementSystem.termproject.entities.ThesisLanguage;
+import DatabaseManagementSystem.termproject.entities.ThesisType;
 import DatabaseManagementSystem.termproject.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,6 +24,8 @@ public class ThesisManager implements ThesisService {
 
     private final ThesisRepository thesisRepo;
     private final UserService userService;
+    private final ThesisTypeService thesisTypeService;
+    private final ThesisLanguageService thesisLanguageService;
 
     @Override
     public DataResult<List<Thesis>> getAllThesis() {
@@ -49,22 +53,38 @@ public class ThesisManager implements ThesisService {
 
     @Override
     public Result saveNewThesis(ThesisModel model) {
-        ThesisType type;
-        TextLanguage language;
-        try {
-            type = ThesisType.valueOf(model.getType().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return new ErrorResult("Thesis Type not exists: " + model.getType());
+        DataResult typeResult = thesisTypeService.getById(model.getTypeId());
+        DataResult languageResult = thesisLanguageService.getById(model.getLanguageId());
+        DataResult supervisorResult = userService.getUserById(model.getSupervisorId());
+        DataResult coSupervisorResult = userService.getUserById(model.getCoSupervisorId());
+
+        if (!typeResult.isSuccess()) {
+            return new ErrorResult(typeResult.getMessage());
         }
-        try {
-            language = TextLanguage.valueOf(model.getLanguage().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return new ErrorResult("Text Language not exists: " + model.getLanguage());
+        if (!languageResult.isSuccess()) {
+            return new ErrorResult(languageResult.getMessage());
+        }
+        if (!supervisorResult.isSuccess()) {
+            return new ErrorResult("Supervisor: " + supervisorResult.getMessage());
+        }
+        if (!coSupervisorResult.isSuccess()) {
+            return new ErrorResult("Co-Supervisor: " + coSupervisorResult.getMessage());
         }
 
         DataResult userResult = userService.getUserByEmail(
                 SecurityContextHolder.getContext().
                         getAuthentication().getName());
+
+        User author = (User) userResult.getData();
+        User supervisor = (User) supervisorResult.getData();
+        User coSupervisor = (User) coSupervisorResult.getData();
+
+        if (author == supervisor || author == coSupervisor || supervisor == coSupervisor) {
+            return new ErrorResult("Author or Supervisor or Co-Supervisor same error: " +
+                    author.getUserId() + "-" +
+                    supervisor.getUserId() + "-" +
+                    coSupervisor.getUserId());
+        }
 
         try {
             thesisRepo.save(
@@ -77,9 +97,11 @@ public class ThesisManager implements ThesisService {
                             .institute(model.getInstitute())
                             .numberOfPages(model.getNumberOfPages())
                             .relatedKeywords(model.getRelatedKeywords())
-                            .type(type)
-                            .language(language)
+                            .type((ThesisType) typeResult.getData())
+                            .language((ThesisLanguage) languageResult.getData())
                             .author((User) userResult.getData())
+                            .supervisor((User) supervisorResult.getData())
+                            .coSupervisor((User) coSupervisorResult.getData())
                             .build()
             );
         } catch (DataIntegrityViolationException e) {
@@ -122,7 +144,7 @@ public class ThesisManager implements ThesisService {
                         getAuthentication().getName());
         User authUser = (User)userResult.getData();
 
-        if (thesis.getAuthor().getEmail() != authUser.getEmail() || thesis.getSupervisors().contains(authUser)) {
+        if (thesis.getAuthor().getEmail() != authUser.getEmail()) { // || thesis.getSupervisors().contains(authUser)
             return new ErrorResult("Client has no permission on Thesis");
         }
 
@@ -133,6 +155,7 @@ public class ThesisManager implements ThesisService {
         }
         return new SuccessResult("Thesis deleted: " + thesis.getThesisNo());
     }
+    /*
 
     @Override
     public Result addSupervisorToThesis(int thesisId, int userId) {
@@ -199,5 +222,7 @@ public class ThesisManager implements ThesisService {
         return new SuccessResult("Supervisor " + action + " Thesis");
 
     }
+
+     */
 
 }

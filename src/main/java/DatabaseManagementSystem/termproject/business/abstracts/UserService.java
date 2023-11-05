@@ -1,5 +1,6 @@
 package DatabaseManagementSystem.termproject.business.abstracts;
 
+import DatabaseManagementSystem.termproject.core.enums.Role;
 import DatabaseManagementSystem.termproject.core.utils.results.DataResult;
 import DatabaseManagementSystem.termproject.user.User;
 

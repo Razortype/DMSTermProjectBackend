@@ -1,7 +1,5 @@
 package DatabaseManagementSystem.termproject.entities;
 
-import DatabaseManagementSystem.termproject.core.enums.TextLanguage;
-import DatabaseManagementSystem.termproject.core.enums.ThesisType;
 import DatabaseManagementSystem.termproject.user.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -12,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -50,28 +50,31 @@ public class Thesis {
     @Column(name = "related_keywords")
     private String relatedKeywords;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "thesis_type_id")
     private ThesisType type;
 
-    @Enumerated(EnumType.STRING)
-    private TextLanguage language;
+    @ManyToOne
+    @JoinColumn(name = "thesis_language_id")
+    private ThesisLanguage language;
 
     @CreationTimestamp
     @Column(name = "submission_date")
     private Date submissionDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id", referencedColumnName = "user_id")
+    @NotNull
     private User author;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(
-            name = "supervisor_thesis_rel",
-            joinColumns = @JoinColumn(name = "thesis_id", referencedColumnName = "thesis_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    )
-    @Column(name = "supervisors")
-    @JsonManagedReference
-    private List<User> supervisors;
+    @ManyToOne
+    @JoinColumn(name = "supervisor_id", referencedColumnName = "user_id")
+    @NotNull
+    private User supervisor;
+
+    @ManyToOne
+    @JoinColumn(name = "co_supervisor_id", referencedColumnName = "user_id")
+    @NotNull
+    private User coSupervisor;
 
 }

@@ -1,8 +1,8 @@
 package DatabaseManagementSystem.termproject.user;
 
 import DatabaseManagementSystem.termproject.core.enums.Gender;
-import DatabaseManagementSystem.termproject.core.enums.Profession;
 import DatabaseManagementSystem.termproject.core.enums.Role;
+import DatabaseManagementSystem.termproject.entities.Profession;
 import DatabaseManagementSystem.termproject.entities.Thesis;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,9 +45,11 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private int age;
+    @Column(name = "birth_year")
+    private int birthYear;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "profession_id")
     private Profession profession;
 
     @Enumerated(EnumType.STRING)
@@ -57,9 +59,11 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Thesis> thesis;
 
+    /*
     @ManyToMany(mappedBy = "supervisors")
     @JsonBackReference
     private List<Thesis> thesisList;
+     */
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
