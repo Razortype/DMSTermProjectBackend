@@ -12,6 +12,9 @@ public interface ProfessionService {
     DataResult<List<Profession>> getAllProfessions();
     DataResult<Profession> getById(int professionId);
     Result saveNewProfession(ProfessionModel model);
-    Result saveNewProfession(Profession profession);
+    Result saveProfession(Profession profession);
+    Result updateProfessionById(int professionId, ProfessionModel model);
+    Result deleteProfessionById(int professionId);
+    Result deleteProfession(Profession profession);
 
 }

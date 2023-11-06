@@ -65,7 +65,7 @@ public class DeveloperDataLoader implements ApplicationRunner {
                 {"SPECIALIST", "An expert or professional with specialized knowledge."}
         };
         for (String[] profession : professionData) {
-            professionService.saveNewProfession(
+            professionService.saveProfession(
                     Profession.builder()
                             .professionName(profession[0])
                             .professionDescription(profession[1])
@@ -78,7 +78,7 @@ public class DeveloperDataLoader implements ApplicationRunner {
     public void addThesisLanguages() {
         String[] languages = {"Turkish", "English", "French"};
         for (String language: languages) {
-            thesisLanguageService.saveNewThesisLanguage(
+            thesisLanguageService.saveThesisLanguage(
                     ThesisLanguage.builder().thesisLanguage(language).build());
             log.info("Thesis Language added:" + language);
         }
@@ -92,7 +92,7 @@ public class DeveloperDataLoader implements ApplicationRunner {
                 {"Proficiency in Art Thesis", "A creative or research project demonstrating mastery in the field of art."}
         };
         for (String[] thesisType: thesisTypeData) {
-            thesisTypeService.saveNewThesisType(
+            thesisTypeService.saveThesisType(
                     ThesisType.builder()
                             .thesisTypeName(thesisType[0])
                             .thesisTypeDescription(thesisType[1])
