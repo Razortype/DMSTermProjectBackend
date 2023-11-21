@@ -14,6 +14,15 @@ public interface ThesisService {
     Result saveNewThesis(ThesisModel model);
     Result deleteById(int thesisId);
     Result deleteThesisOwnByUser(int thesisId);
+    Result addSubjectToThesisByOwner(int thesisId, int subjectId);
+    Result removeSubjectFromThesisByOwner(int thesisId, int subjectId);
+    Result addKeywordToThesisByOwner(int thesisId, int keywordId);
+    Result removeKeywordFromThesisByOwner(int thesisId, int keywordId);
+    Result addSubjectToThesis(int thesisId, int subjectId);
+    Result removeSubjectFromThesis(int thesisId, int subjectId);
+    Result addKeywordToThesis(int thesisId, int keywordId);
+    Result removeKeywordFromThesis(int thesisId, int keywordId);
+
     /*
     Result addSupervisorToThesis(int thesisId, int userId);
     Result removeSupervisorFromThesis(int thesisId, int userId);

@@ -1,7 +1,6 @@
 package DatabaseManagementSystem.termproject.entities;
 
 import DatabaseManagementSystem.termproject.user.User;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +30,23 @@ public class Thesis {
     @Column(name = "thesis_no", length = 7, unique = true)
     private String thesisNo;
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "thesis_subject_rel",
+            joinColumns = @JoinColumn(name = "thesis_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private List<Subject> subjects;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "thesis_keyword_rel",
+            joinColumns = @JoinColumn(name = "thesis_id"),
+            inverseJoinColumns = @JoinColumn(name = "keyword_id")
+    )
+    @Column(name = "related_keywords")
+    private List<RelatedKeyword> relatedKeywords;
+
     @Column(length = 500)
     private String title;
 
@@ -40,15 +55,16 @@ public class Thesis {
 
     private int year;
 
-    private String university;
+    @ManyToOne
+    @JoinColumn(name = "university_id")
+    private University university;
 
-    private String institute;
+    @ManyToOne
+    @JoinColumn(name = "institute_id")
+    private Institute institute;
 
     @Column(name = "number_of_pages")
     private int numberOfPages;
-
-    @Column(name = "related_keywords")
-    private String relatedKeywords;
 
     @ManyToOne
     @JoinColumn(name = "thesis_type_id")

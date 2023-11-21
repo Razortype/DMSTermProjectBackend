@@ -1,21 +1,17 @@
 package DatabaseManagementSystem.termproject.business.concretes;
 
 import DatabaseManagementSystem.termproject.api.models.ThesisModel;
-import DatabaseManagementSystem.termproject.business.abstracts.ThesisLanguageService;
-import DatabaseManagementSystem.termproject.business.abstracts.ThesisService;
-import DatabaseManagementSystem.termproject.business.abstracts.ThesisTypeService;
-import DatabaseManagementSystem.termproject.business.abstracts.UserService;
+import DatabaseManagementSystem.termproject.business.abstracts.*;
 import DatabaseManagementSystem.termproject.core.utils.results.*;
 import DatabaseManagementSystem.termproject.dataAccess.ThesisRepository;
-import DatabaseManagementSystem.termproject.entities.Thesis;
-import DatabaseManagementSystem.termproject.entities.ThesisLanguage;
-import DatabaseManagementSystem.termproject.entities.ThesisType;
+import DatabaseManagementSystem.termproject.entities.*;
 import DatabaseManagementSystem.termproject.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -26,6 +22,10 @@ public class ThesisManager implements ThesisService {
     private final UserService userService;
     private final ThesisTypeService thesisTypeService;
     private final ThesisLanguageService thesisLanguageService;
+    private final SubjectService subjectService;
+    private final RelatedKeywordService relatedKeywordService;
+    private final UniversityService universityService;
+    private final InstituteService instituteService;
 
     @Override
     public DataResult<List<Thesis>> getAllThesis() {
@@ -57,6 +57,10 @@ public class ThesisManager implements ThesisService {
         DataResult languageResult = thesisLanguageService.getById(model.getLanguageId());
         DataResult supervisorResult = userService.getUserById(model.getSupervisorId());
         DataResult coSupervisorResult = userService.getUserById(model.getCoSupervisorId());
+        DataResult universityResult = universityService.getUniversityById(model.getUniversityId());
+        DataResult instituteResult = instituteService.getInstituteById(model.getInstituteId());
+        DataResult relatedKeywordsResult = relatedKeywordService.getRelatedKeywordsByIdsIn(Arrays.stream(model.getRelatedKeywordIds()).toList());
+        DataResult subjectResult = subjectService.getSubjectsByIdsIn(Arrays.stream(model.getSubjectIds()).toList());
 
         if (!typeResult.isSuccess()) {
             return new ErrorResult(typeResult.getMessage());
@@ -69,6 +73,22 @@ public class ThesisManager implements ThesisService {
         }
         if (!coSupervisorResult.isSuccess()) {
             return new ErrorResult("Co-Supervisor: " + coSupervisorResult.getMessage());
+        }
+        if (!universityResult.isSuccess()) {
+            return new ErrorResult(universityResult.getMessage());
+        }
+        if (!instituteResult.isSuccess()) {
+            return new ErrorResult(instituteResult.getMessage());
+        }
+        if (!relatedKeywordsResult.isSuccess()) {
+            return new ErrorResult(relatedKeywordsResult.getMessage() + "(save)");
+        }
+        if (!subjectResult.isSuccess()) {
+            return new ErrorResult(subjectResult.getMessage() + "(save)");
+        }
+        List<Subject> subjects = (List<Subject>) subjectResult.getData();
+        if (subjects.size() == 0) {
+            return new ErrorResult("At least one Subjects should provided");
         }
 
         DataResult userResult = userService.getUserByEmail(
@@ -90,13 +110,14 @@ public class ThesisManager implements ThesisService {
             thesisRepo.save(
                     Thesis.builder()
                             .thesisNo(model.getThesisNo())
+                            .subjects(subjects)
                             .title(model.getTitle())
                             .thesisAbstract(model.getThesisAbstract())
                             .year(model.getYear())
-                            .university(model.getUniversity())
-                            .institute(model.getInstitute())
+                            .university((University) universityResult.getData())
+                            .institute((Institute) instituteResult.getData())
                             .numberOfPages(model.getNumberOfPages())
-                            .relatedKeywords(model.getRelatedKeywords())
+                            .relatedKeywords((List<RelatedKeyword>) relatedKeywordsResult.getData())
                             .type((ThesisType) typeResult.getData())
                             .language((ThesisLanguage) languageResult.getData())
                             .author((User) userResult.getData())
@@ -154,6 +175,134 @@ public class ThesisManager implements ThesisService {
             return new ErrorResult("Unexpected Error Occurred: " + e.getMessage());
         }
         return new SuccessResult("Thesis deleted: " + thesis.getThesisNo());
+    }
+
+    Result updateSubjectThesisAssociation(int thesisId, int subjectId, boolean addSubject, boolean checkOwnership) {
+        DataResult thesisResult = getThesisById(thesisId);
+        DataResult subjectResult = subjectService.getSubjectById(subjectId);
+        if (!thesisResult.isSuccess()) {
+            return new ErrorResult(thesisResult.getMessage());
+        }
+        if(!subjectResult.isSuccess()) {
+            return new ErrorResult(subjectResult.getMessage());
+        }
+        Thesis thesis = (Thesis) thesisResult.getData();
+        Subject subject = (Subject) subjectResult.getData();
+
+        User author = userService.getUserByEmail(
+                SecurityContextHolder.getContext().
+                        getAuthentication().getName()).getData();
+
+        if (checkOwnership && thesis.getAuthor() != author) {
+            if (author == thesis.getAuthor()) {
+                return new ErrorResult("Thesis Author can not be Supervisor");
+            }
+            return new ErrorResult("Client has no permission on Thesis");
+        }
+
+        if (addSubject == thesis.getSubjects().contains(subject)) {
+            String status = addSubject ? "already" : "not";
+            return new ErrorResult("Subject " + status + " exists in Thesis");
+        }
+
+        if (addSubject) {
+            thesis.getSubjects().add(subject);
+            subject.getThesisList().add(thesis);
+        } else {
+            thesis.getSubjects().remove(subject);
+            subject.getThesisList().remove(thesis);
+        }
+
+        thesisRepo.save(thesis);
+        subjectService.saveSubject(subject);
+
+        String action = addSubject ? "added to" : "removed from";
+        return new SuccessResult("Subject " + action + " Thesis");
+
+    }
+
+    Result updateKeywordThesisAssociation(int thesisId, int keywordId, boolean addKeyword, boolean checkOwnership) {
+        DataResult thesisResult = getThesisById(thesisId);
+        DataResult keywordResult = relatedKeywordService.getRelatedKeywordById(keywordId);
+        if (!thesisResult.isSuccess()) {
+            return new ErrorResult(thesisResult.getMessage());
+        }
+        if(!keywordResult.isSuccess()) {
+            return new ErrorResult(keywordResult.getMessage());
+        }
+        Thesis thesis = (Thesis) thesisResult.getData();
+        RelatedKeyword keyword = (RelatedKeyword) keywordResult.getData();
+
+        User author = userService.getUserByEmail(
+                SecurityContextHolder.getContext().
+                        getAuthentication().getName()).getData();
+
+        if (checkOwnership && thesis.getAuthor() != author) {
+            if (author == thesis.getAuthor()) {
+                return new ErrorResult("Thesis Author can not be Supervisor");
+            }
+            return new ErrorResult("Client has no permission on Thesis");
+        }
+
+        if (addKeyword == thesis.getRelatedKeywords().contains(keyword)) {
+            String status = addKeyword ? "already" : "not";
+            return new ErrorResult("Related keyword " + status + " exists in Thesis");
+        }
+
+        if (addKeyword) {
+            thesis.getRelatedKeywords().add(keyword);
+            keyword.getThesisList().add(thesis);
+        } else {
+            thesis.getRelatedKeywords().remove(keyword);
+            keyword.getThesisList().remove(thesis);
+        }
+
+        thesisRepo.save(thesis);
+        relatedKeywordService.saveRelatedKeyword(keyword);
+
+        String action = addKeyword ? "added to" : "removed from";
+        return new SuccessResult("Related Keyword " + action + " Thesis");
+
+    }
+
+    @Override
+    public Result addSubjectToThesisByOwner(int thesisId, int subjectId) {
+        return updateSubjectThesisAssociation(thesisId, subjectId, true, true);
+    }
+
+    @Override
+    public Result removeSubjectFromThesisByOwner(int thesisId, int subjectId) {
+        return updateSubjectThesisAssociation(thesisId, subjectId, false, true);
+    }
+
+    @Override
+    public Result addKeywordToThesisByOwner(int thesisId, int keywordId) {
+        return updateKeywordThesisAssociation(thesisId, keywordId, true, true);
+    }
+
+    @Override
+    public Result removeKeywordFromThesisByOwner(int thesisId, int keywordId) {
+        return updateKeywordThesisAssociation(thesisId, keywordId, false, true);
+    }
+
+    @Override
+    public Result addSubjectToThesis(int thesisId, int subjectId) {
+        return updateSubjectThesisAssociation(thesisId, subjectId, true, false);
+    }
+
+    @Override
+    public Result removeSubjectFromThesis(int thesisId, int subjectId) {
+        return updateSubjectThesisAssociation(thesisId, subjectId, false, false);
+    }
+
+    @Override
+    public Result addKeywordToThesis(int thesisId, int keywordId) {
+        return updateKeywordThesisAssociation(thesisId, keywordId, true, false);
+    }
+
+    @Override
+    public Result removeKeywordFromThesis(int thesisId, int keywordId) {
+        return updateKeywordThesisAssociation(thesisId, keywordId, false, false);
     }
     /*
 

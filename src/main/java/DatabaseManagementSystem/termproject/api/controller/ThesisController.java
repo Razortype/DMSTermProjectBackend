@@ -45,14 +45,51 @@ public class ThesisController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{thesis_id}")
-    public ResponseEntity<Result> deleteThesisOwnByUser(@PathVariable(name = "thesis_id") int thesisId) {
+    @DeleteMapping("/{thesis-id}")
+    public ResponseEntity<Result> deleteThesisOwnByUser(@PathVariable(name = "thesis-id") int thesisId) {
         Result result = thesisService.deleteThesisOwnByUser(thesisId);
         if (!result.isSuccess()) {
             return ResponseEntity.badRequest().body(result);
         }
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping("/{thesis-id}/add/keyword/{keyword-id}")
+    public ResponseEntity<Result> addKeywordToThesis(@PathVariable(name = "thesis-id") int thesisId, @PathVariable(name = "keyword-id") int keywordId) {
+        Result result = thesisService.addKeywordToThesisByOwner(thesisId, keywordId);
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{thesis-id}/remove/keyword/{keyword-id}")
+    public ResponseEntity<Result> removeKeywordFromThesis(@PathVariable(name = "thesis-id") int thesisId, @PathVariable(name = "keyword-id") int keywordId) {
+        Result result = thesisService.removeKeywordFromThesisByOwner(thesisId, keywordId);
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{thesis-id}/add/subject/{subject-id}")
+    public ResponseEntity<Result> addSubjectToThesis(@PathVariable(name = "thesis-id") int thesisId, @PathVariable(name = "subject-id") int subjectId) {
+        Result result = thesisService.addSubjectToThesisByOwner(thesisId, subjectId);
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{thesis-id}/remove/subject/{subject-id}")
+    public ResponseEntity<Result> removeSubjectFromThesis(@PathVariable(name = "thesis-id") int thesisId, @PathVariable(name = "subject-id") int subjectId) {
+        Result result = thesisService.removeSubjectFromThesisByOwner(thesisId, subjectId);
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
 
     /*
     @PutMapping("/{thesis_id}/add/{user_id}")
