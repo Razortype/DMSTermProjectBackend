@@ -19,7 +19,7 @@ public class University {
     @Column(name = "university_id")
     private int universityId;
 
-    @Column(name = "university_name", unique = true)
+    @Column(name = "university_name", unique = true, length = 150)
     private String universityName;
 
 }

@@ -22,7 +22,7 @@ public class ThesisType {
     @Column(name = "thesis_type_id")
     private int thesisTypeId;
 
-    @Column(name = "thesis_type_name", unique = true)
+    @Column(name = "thesis_type_name", unique = true, length = 100)
     private String thesisTypeName;
 
     @Column(name = "thesis_type_description")

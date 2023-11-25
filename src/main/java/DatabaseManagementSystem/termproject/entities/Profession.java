@@ -26,7 +26,7 @@ public class Profession {
     @Column(name = "profession_name")
     private String professionName;
 
-    @Column(name = "profession_description")
+    @Column(name = "profession_description", length = 100)
     private String professionDescription;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "profession")

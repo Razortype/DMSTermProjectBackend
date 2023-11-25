@@ -22,7 +22,7 @@ public class Subject {
     @Column(name = "subject_id")
     private int subjectId;
 
-    @Column(name = "subject_name", unique = true)
+    @Column(name = "subject_name", unique = true, length = 100)
     private String subjectName;
 
     @ManyToMany(mappedBy = "subjects")

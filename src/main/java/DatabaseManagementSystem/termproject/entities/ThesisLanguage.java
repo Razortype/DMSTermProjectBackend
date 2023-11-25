@@ -22,7 +22,7 @@ public class ThesisLanguage {
     @Column(name = "thesis_language_id")
     private int thesisLanguageId;
 
-    @Column(name = "thesis_language", unique = true)
+    @Column(name = "thesis_language", unique = true, length = 100)
     private String thesisLanguage;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "language")

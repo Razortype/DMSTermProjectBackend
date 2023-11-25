@@ -22,7 +22,7 @@ public class RelatedKeyword {
     @Column(name = "keyword_id")
     private int keywordId;
 
-    @Column(name = "related_keyword", unique = true)
+    @Column(name = "related_keyword", unique = true, length = 100)
     private String relatedKeyword;
 
     @ManyToMany(mappedBy = "relatedKeywords")

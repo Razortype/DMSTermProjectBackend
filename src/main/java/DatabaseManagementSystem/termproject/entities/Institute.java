@@ -16,7 +16,7 @@ public class Institute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "institute_id")
+    @Column(name = "institute_id", length = 150)
     private int instituteId;
 
     @Column(name = "institute_name", unique = true)
