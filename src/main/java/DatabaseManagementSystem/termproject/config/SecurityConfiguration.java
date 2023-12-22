@@ -43,6 +43,10 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/thesis/**").hasAnyAuthority("USER", "MANAGER", "ADMIN")
                 .requestMatchers("/api/v1/manager/**").hasAnyAuthority("MANAGER", "ADMIN")
                 .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN")
+
+                // hand fixed
+                .requestMatchers("/api/v1/profession").permitAll()
+
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
