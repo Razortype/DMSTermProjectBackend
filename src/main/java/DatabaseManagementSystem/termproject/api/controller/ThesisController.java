@@ -19,8 +19,17 @@ public class ThesisController {
     private final ThesisService thesisService;
 
     @GetMapping("")
-    public ResponseEntity<DataResult<List<Thesis>>> getAllThesis() {
-        DataResult result = thesisService.getAllThesis();
+    public ResponseEntity<DataResult<List<Thesis>>> getAllThesisByFiltered(
+            @RequestParam(name = "word", required = false) String word,
+            @RequestParam(name = "keywords", required = false) List<Integer> keywordIds,
+            @RequestParam(name = "subjects", required = false) List<Integer> subjectIds,
+            @RequestParam(name = "universities", required = false) List<Integer> universityIds,
+            @RequestParam(name = "institutes", required = false) List<Integer> instituteIds,
+            @RequestParam(name = "users", required = false) List<Integer> userIds,
+            @RequestParam(name = "languages", required = false) List<Integer> languageIds,
+            @RequestParam(name = "types", required = false) List<Integer> typeIds
+    ) {
+        DataResult result = thesisService.getThesisBySearchQuery(word, keywordIds, subjectIds, universityIds, instituteIds, userIds, languageIds, typeIds);
         if (!result.isSuccess()) {
             return ResponseEntity.badRequest().body(result);
         }

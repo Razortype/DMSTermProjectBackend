@@ -23,6 +23,14 @@ public interface ThesisService {
     Result addKeywordToThesis(int thesisId, int keywordId);
     Result removeKeywordFromThesis(int thesisId, int keywordId);
 
+    DataResult<List<Thesis>> getThesisBySearchQuery(String word,
+                                        List<Integer> keywords,
+                                        List<Integer> subjects,
+                                        List<Integer> universities,
+                                        List<Integer> institutes,
+                                        List<Integer> users,
+                                        List<Integer> languages,
+                                        List<Integer> types);
     /*
     Result addSupervisorToThesis(int thesisId, int userId);
     Result removeSupervisorFromThesis(int thesisId, int userId);

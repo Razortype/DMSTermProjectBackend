@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -303,6 +304,26 @@ public class ThesisManager implements ThesisService {
     @Override
     public Result removeKeywordFromThesis(int thesisId, int keywordId) {
         return updateKeywordThesisAssociation(thesisId, keywordId, false, false);
+    }
+
+    @Override
+    public DataResult<List<Thesis>> getThesisBySearchQuery(String word, List<Integer> keywords, List<Integer> subjects, List<Integer> universities, List<Integer> institutes, List<Integer> users, List<Integer> languages, List<Integer> types) {
+        List<Thesis> filteredThesisList = thesisRepo.findBySearchQuery(word, keywords, subjects, universities, institutes, users, languages, types);
+
+        List<String> filtered = new ArrayList<>();
+        if (word != null && !word.isEmpty()) filtered.add("word");
+        if (keywords != null && !keywords.isEmpty()) filtered.add("keyword");
+        if (subjects != null && !subjects.isEmpty()) filtered.add("subject");
+        if (universities != null && !universities.isEmpty()) filtered.add("university");
+        if (institutes != null && !institutes.isEmpty()) filtered.add("institute");
+        if (users != null && !users.isEmpty()) filtered.add("users");
+        if (languages != null && !languages.isEmpty()) filtered.add("language");
+        if (types != null && !types.isEmpty()) filtered.add("type");
+
+        String filteredText = "";
+        if (!filtered.isEmpty()) filteredText = String.format(" | filtered : [ %s ]", String.join(", ", filtered));
+
+        return new SuccessDataResult<>(filteredThesisList, "Thesis Result" + filteredText);
     }
     /*
 
