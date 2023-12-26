@@ -4,29 +4,32 @@ import DatabaseManagementSystem.termproject.entities.*;
 import DatabaseManagementSystem.termproject.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
     List<Thesis> getAllByAuthor(User user);
 
-    @Query("""
-    select t from Thesis t \s
-    where (:word is null or t.title like %:word%) \s
-    and (:keywords is null or t.relatedKeywords in :keywords) \s
-    and (:subjects is null or t.subjects in :subjects) \s
-    and (:universities is null or t.university.universityId in :universities) \s
-    and (:institutes is null or t.institute.instituteId in :institutes) \s
-    and (:users is null or t.author.userId in :users or t.supervisor.userId in :users or t.coSupervisor.userId in :users) \s
-    and (:languages is null or t.language.thesisLanguageId in :languages) \s
-    and (:types is null or t.type.thesisTypeId in :types) \s
-    """)
-    List<Thesis> findBySearchQuery(String word,
-                                   List<Integer> keywords,
-                                   List<Integer> subjects,
-                                   List<Integer> universities,
-                                   List<Integer> institutes,
-                                   List<Integer> users,
-                                   List<Integer> languages,
-                                   List<Integer> types);
+    @Query("SELECT DISTINCT t FROM Thesis t " +
+            "LEFT JOIN t.relatedKeywords rk " +
+            "LEFT JOIN t.subjects s " +
+            "WHERE (:word IS NULL OR LOWER(t.title) LIKE %:word% OR LOWER(t.thesisAbstract) LIKE %:word%) " +
+            "AND (:keywords IS NULL OR rk.keywordId IN :keywords) " +
+            "AND (:subjects IS NULL OR s.subjectId IN :subjects) " +
+            "AND (:universities IS NULL OR t.university.universityId IN :universities) " +
+            "AND (:institutes IS NULL OR t.institute.instituteId IN :institutes) " +
+            "AND (:users IS NULL OR t.author.userId IN :users) " +
+            "AND (:languages IS NULL OR t.language.thesisLanguageId IN :languages) " +
+            "AND (:types IS NULL OR t.type.thesisTypeId IN :types)")
+    List<Thesis> findBySearchQuery(
+            @Param("word") String word,
+            @Param("keywords") List<Integer> keywords,
+            @Param("subjects") List<Integer> subjects,
+            @Param("universities") List<Integer> universities,
+            @Param("institutes") List<Integer> institutes,
+            @Param("users") List<Integer> users,
+            @Param("languages") List<Integer> languages,
+            @Param("types") List<Integer> types
+    );
 }
