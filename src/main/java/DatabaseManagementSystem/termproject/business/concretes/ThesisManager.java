@@ -7,6 +7,7 @@ import DatabaseManagementSystem.termproject.dataAccess.ThesisRepository;
 import DatabaseManagementSystem.termproject.entities.*;
 import DatabaseManagementSystem.termproject.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ThesisManager implements ThesisService {
 
     private final ThesisRepository thesisRepo;
