@@ -7,6 +7,8 @@ import DatabaseManagementSystem.termproject.core.utils.results.SuccessDataResult
 import DatabaseManagementSystem.termproject.user.User;
 import DatabaseManagementSystem.termproject.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,6 +41,12 @@ public class UserManager implements UserService {
             return new ErrorDataResult<>("User not found: " + email);
         }
         return new SuccessDataResult<>(user, "User fetched");
+    }
+
+    @Override
+    public DataResult<User> getUserByToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return getUserByEmail(authentication.getName());
     }
 
     @Override
