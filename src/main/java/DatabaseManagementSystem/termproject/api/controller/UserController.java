@@ -28,6 +28,15 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/current")
+    public ResponseEntity<DataResult<User>> getCurrentUserByToken() {
+        DataResult result = userService.getUserByToken();
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/{user_id}")
     public ResponseEntity<DataResult<User>> getUserById(@PathVariable(name = "user_id") int userId) {
         DataResult result = userService.getUserById(userId);

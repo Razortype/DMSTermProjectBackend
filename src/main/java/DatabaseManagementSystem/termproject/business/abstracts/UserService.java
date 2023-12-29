@@ -11,6 +11,7 @@ public interface UserService {
     DataResult<List<User>> getAllUser();
     DataResult<User> getUserById(int userId);
     DataResult<User> getUserByEmail(String email);
+    DataResult<User> getUserByToken();
     void saveUser(User user);
 
 }
