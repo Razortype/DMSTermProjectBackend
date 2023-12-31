@@ -334,7 +334,7 @@ public class ThesisManager implements ThesisService {
 
         List<Integer> thesisIdList = thesisRepo.getThesisIdList();
 
-        if (n > thesisIdList.size() || n<= 0) {
+        if (n > thesisIdList.size() || n <= 0) {
             return new ErrorDataResult<>("random amount error: " + n + "/" +thesisIdList.size());
         }
 

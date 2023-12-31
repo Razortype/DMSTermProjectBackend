@@ -14,4 +14,7 @@ public interface UserService {
     DataResult<User> getUserByToken();
     void saveUser(User user);
 
+    DataResult<List<User>> searchUserByFilter(String text);
+    DataResult<List<User>> getNRandomUser(int n);
+
 }

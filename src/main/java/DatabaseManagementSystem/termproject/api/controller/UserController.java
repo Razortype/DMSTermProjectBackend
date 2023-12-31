@@ -5,10 +5,7 @@ import DatabaseManagementSystem.termproject.core.utils.results.DataResult;
 import DatabaseManagementSystem.termproject.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,9 +16,36 @@ public class UserController {
 
     private final UserService userService;
 
+    /*
     @GetMapping("")
-    public ResponseEntity<DataResult<List<User>>> getAllUsers() {
-        DataResult result = userService.getAllUser();
+    public ResponseEntity<DataResult<Integer>> getAllThesisByFiltered(
+            @RequestParam(name = "word", required = false) String word,
+            @RequestParam(name = "keywords", required = false) List<Integer> keywordIds,
+            @RequestParam(name = "subjects", required = false) List<Integer> subjectIds,
+            @RequestParam(name = "universities", required = false) List<Integer> universityIds,
+            @RequestParam(name = "institutes", required = false) List<Integer> instituteIds,
+            @RequestParam(name = "users", required = false) List<Integer> userIds,
+            @RequestParam(name = "languages", required = false) List<Integer> languageIds,
+            @RequestParam(name = "types", required = false) List<Integer> typeIds,
+            @RequestParam(name = "random", required = false) Integer n
+    )
+     */
+
+    @GetMapping("")
+    public ResponseEntity<DataResult<List<User>>> getAllUsers(
+            @RequestParam(name = "text", required = false) String text,
+            @RequestParam(name = "random", required = false) Integer n
+    ) {
+
+        DataResult result;
+        if (n != null) {
+            result = userService.getNRandomUser(n);
+        } else if (text != null) {
+            result = userService.searchUserByFilter(text);
+        } else {
+            result = userService.getAllUser();
+        }
+
         if (!result.isSuccess()) {
             return ResponseEntity.badRequest().body(result);
         }
