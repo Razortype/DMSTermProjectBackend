@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -52,5 +53,30 @@ public class UserManager implements UserService {
     @Override
     public void saveUser(User user) {
         userRepo.save(user);
+    }
+
+    @Override
+    public DataResult<List<User>> searchUserByFilter(String text) {
+        if (text.isBlank()) {
+            return new ErrorDataResult<>("text cannot be blank");
+        }
+        List<User> users = userRepo.searchUserByFilter(text.toLowerCase());
+        return new SuccessDataResult<>(users, "Users fetched by filter, text="+text);
+    }
+
+    @Override
+    public DataResult<List<User>> getNRandomUser(int n) {
+
+        List<Integer> usersIdList = userRepo.getUserIdList();
+        if (n > usersIdList.size() || n <= 0) {
+            return new ErrorDataResult<>("random amount error: " + n + "/" + usersIdList.size());
+        }
+
+        Collections.shuffle(usersIdList);
+        List<Integer> randomNUserIds = usersIdList.subList(0, n);
+
+        List<User> users = userRepo.findAllByUserIdIn(randomNUserIds);
+        return new SuccessDataResult<>(users, "Users random element fetched: " + n);
+
     }
 }
