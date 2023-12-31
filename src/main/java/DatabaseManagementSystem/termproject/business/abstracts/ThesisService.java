@@ -31,6 +31,9 @@ public interface ThesisService {
                                         List<Integer> users,
                                         List<Integer> languages,
                                         List<Integer> types);
+
+    DataResult<List<Thesis>> getNRandomThesis(int n);
+
     /*
     Result addSupervisorToThesis(int thesisId, int userId);
     Result removeSupervisorFromThesis(int thesisId, int userId);

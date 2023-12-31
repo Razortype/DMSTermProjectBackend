@@ -32,4 +32,10 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
             @Param("languages") List<Integer> languages,
             @Param("types") List<Integer> types
     );
+
+    @Query("SELECT t.thesisId from Thesis t")
+    List<Integer> getThesisIdList();
+
+    List<Thesis> findAllByThesisIdIn(List<Integer> ids);
+
 }
