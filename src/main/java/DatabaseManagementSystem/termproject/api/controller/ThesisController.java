@@ -4,6 +4,7 @@ import DatabaseManagementSystem.termproject.api.models.ThesisModel;
 import DatabaseManagementSystem.termproject.business.abstracts.ThesisService;
 import DatabaseManagementSystem.termproject.core.utils.results.DataResult;
 import DatabaseManagementSystem.termproject.core.utils.results.Result;
+import DatabaseManagementSystem.termproject.core.utils.results.SuccessDataResult;
 import DatabaseManagementSystem.termproject.entities.Thesis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class ThesisController {
     private final ThesisService thesisService;
 
     @GetMapping("")
-    public ResponseEntity<DataResult<List<Thesis>>> getAllThesisByFiltered(
+    public ResponseEntity<DataResult<Integer>> getAllThesisByFiltered(
             @RequestParam(name = "word", required = false) String word,
             @RequestParam(name = "keywords", required = false) List<Integer> keywordIds,
             @RequestParam(name = "subjects", required = false) List<Integer> subjectIds,
@@ -27,13 +28,21 @@ public class ThesisController {
             @RequestParam(name = "institutes", required = false) List<Integer> instituteIds,
             @RequestParam(name = "users", required = false) List<Integer> userIds,
             @RequestParam(name = "languages", required = false) List<Integer> languageIds,
-            @RequestParam(name = "types", required = false) List<Integer> typeIds
+            @RequestParam(name = "types", required = false) List<Integer> typeIds,
+            @RequestParam(name = "random", required = false) Integer n
     ) {
-        DataResult result = thesisService.getThesisBySearchQuery(word, keywordIds, subjectIds, universityIds, instituteIds, userIds, languageIds, typeIds);
+        DataResult result;
+        if (n == null) {
+            result = thesisService.getThesisBySearchQuery(word, keywordIds, subjectIds, universityIds, instituteIds, userIds, languageIds, typeIds);
+        } else {
+            result = thesisService.getNRandomThesis(n);
+        }
+
         if (!result.isSuccess()) {
             return ResponseEntity.badRequest().body(result);
         }
         return ResponseEntity.ok(result);
+
     }
 
     @GetMapping("/my")
@@ -48,6 +57,15 @@ public class ThesisController {
     @PostMapping("")
     public ResponseEntity<Result> saveNewThesis(@RequestBody ThesisModel model) {
         Result result = thesisService.saveNewThesis(model);
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{thesis-id}")
+    public ResponseEntity<DataResult> getThesisById(@PathVariable(name = "thesis-id") int thesisId) {
+        DataResult result = thesisService.getThesisById(thesisId);
         if (!result.isSuccess()) {
             return ResponseEntity.badRequest().body(result);
         }
@@ -98,7 +116,6 @@ public class ThesisController {
         }
         return ResponseEntity.ok(result);
     }
-
 
     /*
     @PutMapping("/{thesis_id}/add/{user_id}")

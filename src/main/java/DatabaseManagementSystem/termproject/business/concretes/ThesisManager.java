@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -326,6 +327,24 @@ public class ThesisManager implements ThesisService {
         if (!filtered.isEmpty()) filteredText = String.format(" | filtered : [ %s ]", String.join(", ", filtered));
 
         return new SuccessDataResult<>(filteredThesisList, "Thesis Result" + filteredText);
+    }
+
+    @Override
+    public DataResult<List<Thesis>> getNRandomThesis(int n) {
+
+        List<Integer> thesisIdList = thesisRepo.getThesisIdList();
+
+        if (n > thesisIdList.size() || n<= 0) {
+            return new ErrorDataResult<>("random amount error: " + n + "/" +thesisIdList.size());
+        }
+
+        Collections.shuffle(thesisIdList);
+        List<Integer> randomNThesisIdList = thesisIdList.subList(0, n);
+        List<Thesis> thesisList = thesisRepo.findAllByThesisIdIn(randomNThesisIdList);
+
+        Collections.shuffle(thesisList);
+
+        return new SuccessDataResult<>(thesisList, "Thesis random element fetched : " + n);
     }
     /*
 
