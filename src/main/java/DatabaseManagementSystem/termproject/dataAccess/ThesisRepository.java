@@ -38,4 +38,6 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
 
     List<Thesis> findAllByThesisIdIn(List<Integer> ids);
 
+    Boolean existsByThesisNo(String thesisNo);
+
 }

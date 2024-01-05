@@ -12,10 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -344,8 +341,51 @@ public class ThesisManager implements ThesisService {
 
         Collections.shuffle(thesisList);
 
-        return new SuccessDataResult<>(thesisList, "Thesis random element fetched : " + n);
+        return new SuccessDataResult<>(thesisList, "Thesis random element fetched: " + n);
     }
+
+    @Override
+    public DataResult<String> generateNewThesisNo() {
+
+        int count = 0;
+        String randomThesisNo;
+        do {
+            randomThesisNo = generateRandomThesisNo();
+            count++;
+        } while (isThesisNoExists(randomThesisNo));
+
+        return new SuccessDataResult<>(randomThesisNo, "Random Thesis No generated (try): " + count);
+    }
+
+    @Override
+    public DataResult<Boolean> checkThesisNoIsValid(String no) {
+        if (no == null) {
+            return new ErrorDataResult<>("Thesis no not given");
+        }
+        boolean isValid = !isThesisNoExists(no);
+        return new SuccessDataResult<>(isValid, "Thesis no valid check: " + (isValid ? "valid": "not-valid"));
+    }
+
+    private static String generateRandomThesisNo() {
+
+        String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        int maxLength = 7;
+        Random random = new Random();
+        StringBuilder randomString = new StringBuilder();
+
+        for (int i = 0; i < maxLength; i++) {
+            int randomIndex = random.nextInt(allowedCharacters.length());
+
+            randomString.append(allowedCharacters.charAt(randomIndex));
+        }
+
+        return randomString.toString();
+    }
+
+    private boolean isThesisNoExists(String thesisNo) {
+        return thesisRepo.existsByThesisNo(thesisNo);
+    }
+
     /*
 
     @Override
