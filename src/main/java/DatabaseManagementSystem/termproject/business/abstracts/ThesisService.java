@@ -34,6 +34,9 @@ public interface ThesisService {
 
     DataResult<List<Thesis>> getNRandomThesis(int n);
 
+    DataResult<String> generateNewThesisNo();
+    DataResult<Boolean> checkThesisNoIsValid(String no);
+
     /*
     Result addSupervisorToThesis(int thesisId, int userId);
     Result removeSupervisorFromThesis(int thesisId, int userId);

@@ -3,6 +3,7 @@ package DatabaseManagementSystem.termproject.api.controller;
 import DatabaseManagementSystem.termproject.api.models.ThesisModel;
 import DatabaseManagementSystem.termproject.business.abstracts.ThesisService;
 import DatabaseManagementSystem.termproject.core.utils.results.DataResult;
+import DatabaseManagementSystem.termproject.core.utils.results.ErrorDataResult;
 import DatabaseManagementSystem.termproject.core.utils.results.Result;
 import DatabaseManagementSystem.termproject.core.utils.results.SuccessDataResult;
 import DatabaseManagementSystem.termproject.entities.Thesis;
@@ -61,6 +62,32 @@ public class ThesisController {
             return ResponseEntity.badRequest().body(result);
         }
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/thesis-no")
+    public ResponseEntity<DataResult> getNewThesisNo(
+            @RequestParam(name = "action") String action,
+            @RequestParam(name = "no", required = false) String no
+    ) {
+
+        DataResult result;
+
+        switch (action) {
+            case "generate":
+                result = thesisService.generateNewThesisNo();
+                break;
+            case "check":
+                result = thesisService.checkThesisNoIsValid(no);
+                break;
+            default:
+                result = new ErrorDataResult("Action is not valid: " + action);
+        }
+
+        if (!result.isSuccess()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+        return ResponseEntity.ok(result);
+
     }
 
     @GetMapping("/{thesis-id}")
