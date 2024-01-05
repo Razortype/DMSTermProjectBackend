@@ -7,7 +7,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DB_DLL_AUTO}
     show-sql: false
     properties:
       hibernate:
@@ -33,10 +33,10 @@ application:
         expiration: 302400000 # 7 days
 
   cors:
-    test: SELAM
     allowed-origins:
       - http://localhost:3000
       - http://localhost:5173
+      - https://dbm-thesis.vercel.app
     allowed-methods:
       - GET
       - POST

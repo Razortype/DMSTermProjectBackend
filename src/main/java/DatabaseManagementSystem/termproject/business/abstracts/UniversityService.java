@@ -10,6 +10,7 @@ import java.util.List;
 public interface UniversityService {
     DataResult<List<University>> getAllUniversity();
     DataResult<University> getUniversityById(int id);
+    DataResult<University> getUniversityByUniversityName(String name);
     Result saveUniversity(UniversityModel model);
     Result saveUniversity(University university);
     Result updateUniversityById(int id, UniversityModel model);

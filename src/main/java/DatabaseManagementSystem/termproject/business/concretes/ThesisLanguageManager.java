@@ -32,6 +32,15 @@ public class ThesisLanguageManager implements ThesisLanguageService {
     }
 
     @Override
+    public DataResult<ThesisLanguage> getByLanguage(String language) {
+        ThesisLanguage languageObj = thesisLanguageRepository.findThesisLanguageByThesisLanguage(language).orElse(null);
+        if (language == null) {
+            return new ErrorDataResult<>("Thesis Language not found: " + language);
+        }
+        return new SuccessDataResult<>(languageObj, "Thesis Language fetched");
+    }
+
+    @Override
     public Result saveNewThesisLanguage(ThesisLanguageModel model) {
         if (model.getLanguageName().isEmpty()) {
             return new ErrorResult("Thesis Language field(s) could not be empty");

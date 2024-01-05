@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface ThesisTypeRepository extends JpaRepository<ThesisType, Integer> {
 
     Optional<ThesisType> getByThesisTypeId(int thesisTypeId);
+    Optional<ThesisType> findByThesisTypeName(String name);
 
 }

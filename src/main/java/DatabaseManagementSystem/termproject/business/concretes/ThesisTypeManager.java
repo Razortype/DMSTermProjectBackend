@@ -33,6 +33,15 @@ public class ThesisTypeManager implements ThesisTypeService {
     }
 
     @Override
+    public DataResult<ThesisType> getByThesisTypeName(String name) {
+        ThesisType type = thesisTypeRepository.findByThesisTypeName(name).orElse(null);
+        if (type == null) {
+            return new ErrorDataResult<>("Thesis Type not found: " + name);
+        }
+        return new SuccessDataResult<>(type, "Thesis Type fetched");
+    }
+
+    @Override
     public Result saveNewThesisType(ThesisTypeModel model) {
         if (model.getTypeName().isEmpty() || model.getTypeDescription().isEmpty()) {
             return new ErrorResult("Thesis Type field(s) could not be empty");

@@ -10,6 +10,7 @@ import java.util.List;
 public interface InstituteService {
     DataResult<List<Institute>> getAllInstitute();
     DataResult<Institute> getInstituteById(int id);
+    DataResult<Institute> getInstituteByInstituteName(String name);
     Result saveInstitute(InstituteModel model);
     Result saveInstitute(Institute institute);
     Result updateInstituteById(int id, InstituteModel model);

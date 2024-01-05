@@ -33,6 +33,15 @@ public class InstituteManager implements InstituteService {
     }
 
     @Override
+    public DataResult<Institute> getInstituteByInstituteName(String name) {
+        Institute institute = instituteRepository.findByInstituteName(name).orElse(null);
+        if (institute == null) {
+            return new ErrorDataResult<>("Institute not found: " + name);
+        }
+        return new SuccessDataResult<>(institute, "Institute found");
+    }
+
+    @Override
     public Result saveInstitute(InstituteModel model) {
         if (model.getInstituteName() == null || model.getInstituteName().isEmpty()) {
             return new ErrorResult("Institute name can not be empty");

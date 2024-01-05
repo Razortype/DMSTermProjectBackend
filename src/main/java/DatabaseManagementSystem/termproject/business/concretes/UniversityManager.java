@@ -33,6 +33,15 @@ public class UniversityManager implements UniversityService {
     }
 
     @Override
+    public DataResult<University> getUniversityByUniversityName(String name) {
+        University university = universityRepository.findByUniversityName(name).orElse(null);
+        if (university == null) {
+            return new ErrorDataResult<>("University not found: " + name);
+        }
+        return new SuccessDataResult<>(university, "University found");
+    }
+
+    @Override
     public Result saveUniversity(UniversityModel model) {
         if (model.getUniversityName() == null || model.getUniversityName().isEmpty()) {
             return new ErrorResult("University name can not be empty");
