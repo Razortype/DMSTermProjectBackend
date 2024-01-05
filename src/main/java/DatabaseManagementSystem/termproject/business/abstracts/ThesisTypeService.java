@@ -11,6 +11,7 @@ public interface ThesisTypeService {
 
     DataResult<List<ThesisType>> getAllThesisTypes();
     DataResult<ThesisType> getById(int thesisTypeId);
+    DataResult<ThesisType> getByThesisTypeName(String name);
     Result saveNewThesisType (ThesisTypeModel model);
     Result saveThesisType(ThesisType type);
     Result updateThesisType(int thesisTypeId, ThesisTypeModel model);

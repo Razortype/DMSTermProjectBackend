@@ -1,7 +1,6 @@
 package DatabaseManagementSystem.termproject.core.loader;
 
 import DatabaseManagementSystem.termproject.auth.AuthenticationService;
-import DatabaseManagementSystem.termproject.auth.RegisterRequest;
 import DatabaseManagementSystem.termproject.business.abstracts.ProfessionService;
 import DatabaseManagementSystem.termproject.business.abstracts.ThesisLanguageService;
 import DatabaseManagementSystem.termproject.business.abstracts.ThesisTypeService;
@@ -19,11 +18,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor

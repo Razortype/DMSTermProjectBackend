@@ -32,6 +32,15 @@ public class ProfessionManager implements ProfessionService {
     }
 
     @Override
+    public DataResult<Profession> getByProfessionName(String name) {
+        Profession profession = professionRepository.findProfessionByProfessionName(name).orElse(null);
+        if (profession == null) {
+            return new ErrorDataResult<>("Profession not found: " + name);
+        }
+        return new SuccessDataResult<>(profession, "Profession fetched");
+    }
+
+    @Override
     public Result saveNewProfession(ProfessionModel model) {
         return saveProfession(
                 Profession.builder()
