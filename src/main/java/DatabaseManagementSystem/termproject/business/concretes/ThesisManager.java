@@ -9,6 +9,9 @@ import DatabaseManagementSystem.termproject.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -307,8 +310,30 @@ public class ThesisManager implements ThesisService {
     }
 
     @Override
-    public DataResult<List<Thesis>> getThesisBySearchQuery(String word, List<Integer> keywords, List<Integer> subjects, List<Integer> universities, List<Integer> institutes, List<Integer> users, List<Integer> languages, List<Integer> types) {
-        List<Thesis> filteredThesisList = thesisRepo.findBySearchQuery(word, keywords, subjects, universities, institutes, users, languages, types);
+    public DataResult<List<Thesis>> getThesisBySearchQuery(String word,
+                                                           List<Integer> keywords,
+                                                           List<Integer> subjects,
+                                                           List<Integer> universities,
+                                                           List<Integer> institutes,
+                                                           List<Integer> users,
+                                                           List<Integer> languages,
+                                                           List<Integer> types,
+                                                           boolean isOwned,
+                                                           boolean dateDesc,
+                                                           int limit) {
+
+        User author = null;
+        if (isOwned) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            author = userService.getUserByEmail(authentication.getName()).getData();
+        }
+
+        Pageable pageable = Pageable.unpaged();;
+        if (limit <= 0) {
+            pageable = PageRequest.of(0, limit);
+        }
+
+        List<Thesis> filteredThesisList = thesisRepo.findBySearchQuery(word, keywords, subjects, universities, institutes, users, languages, types, author, dateDesc, pageable);
 
         List<String> filtered = new ArrayList<>();
         if (word != null && !word.isEmpty()) filtered.add("word");
@@ -319,6 +344,7 @@ public class ThesisManager implements ThesisService {
         if (users != null && !users.isEmpty()) filtered.add("users");
         if (languages != null && !languages.isEmpty()) filtered.add("language");
         if (types != null && !types.isEmpty()) filtered.add("type");
+        if (author != null) filtered.add("author");
 
         String filteredText = "";
         if (!filtered.isEmpty()) filteredText = String.format(" | filtered : [ %s ]", String.join(", ", filtered));
@@ -350,6 +376,11 @@ public class ThesisManager implements ThesisService {
         int count = 0;
         String randomThesisNo;
         do {
+
+            if (count >= 50) {
+                return new ErrorDataResult<>("Regenerate Thesis-no reached upper limit: 50");
+            }
+
             randomThesisNo = generateRandomThesisNo();
             count++;
         } while (isThesisNoExists(randomThesisNo));
@@ -364,6 +395,12 @@ public class ThesisManager implements ThesisService {
         }
         boolean isValid = !isThesisNoExists(no);
         return new SuccessDataResult<>(isValid, "Thesis no valid check: " + (isValid ? "valid": "not-valid"));
+    }
+
+    @Override
+    public DataResult<List<Thesis>> findLastNThesis(int n) {
+        List<Thesis> thesisList = thesisRepo.findLastNThesis(n);
+        return new SuccessDataResult<>(thesisList, "Last n Thesis fetched: " + n);
     }
 
     private static String generateRandomThesisNo() {
