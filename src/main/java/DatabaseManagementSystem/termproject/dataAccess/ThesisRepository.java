@@ -2,6 +2,7 @@ package DatabaseManagementSystem.termproject.dataAccess;
 
 import DatabaseManagementSystem.termproject.entities.*;
 import DatabaseManagementSystem.termproject.user.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,11 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
             "AND (:institutes IS NULL OR t.institute.instituteId IN :institutes) " +
             "AND (:users IS NULL OR t.author.userId IN :users) " +
             "AND (:languages IS NULL OR t.language.thesisLanguageId IN :languages) " +
-            "AND (:types IS NULL OR t.type.thesisTypeId IN :types)")
+            "AND (:types IS NULL OR t.type.thesisTypeId IN :types)" +
+            "AND (:author IS NULL OR t.author = :author)" +
+            "ORDER BY " +
+            "CASE WHEN :reversed = true THEN t.submissionDate ELSE 0 END DESC NULLS LAST, " +
+            "CASE WHEN :reversed = false THEN t.submissionDate ELSE 0 END ASC NULLS FIRST")
     List<Thesis> findBySearchQuery(
             @Param("word") String word,
             @Param("keywords") List<Integer> keywords,
@@ -30,7 +35,10 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
             @Param("institutes") List<Integer> institutes,
             @Param("users") List<Integer> users,
             @Param("languages") List<Integer> languages,
-            @Param("types") List<Integer> types
+            @Param("types") List<Integer> types,
+            @Param("author") User author,
+            @Param("reversed") boolean reversed,
+            Pageable pageable
     );
 
     @Query("SELECT t.thesisId from Thesis t")
@@ -39,5 +47,8 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
     List<Thesis> findAllByThesisIdIn(List<Integer> ids);
 
     Boolean existsByThesisNo(String thesisNo);
+
+    @Query("SELECT t FROM Thesis t ORDER BY t.submissionDate DESC")
+    List<Thesis> findLastNThesis(int n);
 
 }

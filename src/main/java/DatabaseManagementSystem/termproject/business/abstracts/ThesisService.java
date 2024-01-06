@@ -30,12 +30,17 @@ public interface ThesisService {
                                         List<Integer> institutes,
                                         List<Integer> users,
                                         List<Integer> languages,
-                                        List<Integer> types);
+                                        List<Integer> types,
+                                        boolean isOwned,
+                                        boolean dateDesc,
+                                        int limit);
 
     DataResult<List<Thesis>> getNRandomThesis(int n);
 
     DataResult<String> generateNewThesisNo();
     DataResult<Boolean> checkThesisNoIsValid(String no);
+
+    DataResult<List<Thesis>> findLastNThesis(int n);
 
     /*
     Result addSupervisorToThesis(int thesisId, int userId);

@@ -30,13 +30,20 @@ public class ThesisController {
             @RequestParam(name = "users", required = false) List<Integer> userIds,
             @RequestParam(name = "languages", required = false) List<Integer> languageIds,
             @RequestParam(name = "types", required = false) List<Integer> typeIds,
-            @RequestParam(name = "random", required = false) Integer n
+            @RequestParam(name = "random", required = false) Integer random,
+            @RequestParam(name = "author", required = false) Boolean isOwned,
+            @RequestParam(name = "date-decs", required = false) Boolean dateDecs,
+            @RequestParam(name = "limit", required = false) Integer limit
     ) {
+
         DataResult result;
-        if (n == null) {
-            result = thesisService.getThesisBySearchQuery(word, keywordIds, subjectIds, universityIds, instituteIds, userIds, languageIds, typeIds);
+        if (random == null) {
+            if (isOwned == null) { isOwned = false; }
+            if (dateDecs == null) { dateDecs = false; }
+            if (limit == null) { limit = -1; }
+            result = thesisService.getThesisBySearchQuery(word, keywordIds, subjectIds, universityIds, instituteIds, userIds, languageIds, typeIds, isOwned, dateDecs, limit);
         } else {
-            result = thesisService.getNRandomThesis(n);
+            result = thesisService.getNRandomThesis(random);
         }
 
         if (!result.isSuccess()) {
@@ -44,15 +51,6 @@ public class ThesisController {
         }
         return ResponseEntity.ok(result);
 
-    }
-
-    @GetMapping("/my")
-    public ResponseEntity<DataResult<List<Thesis>>> getAllThesisByUser() {
-        DataResult result = thesisService.getAllThesisByUser();
-        if (!result.isSuccess()) {
-            return ResponseEntity.badRequest().body(result);
-        }
-        return ResponseEntity.ok(result);
     }
 
     @PostMapping("")
