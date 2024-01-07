@@ -328,12 +328,12 @@ public class ThesisManager implements ThesisService {
             author = userService.getUserByEmail(authentication.getName()).getData();
         }
 
-        Pageable pageable = Pageable.unpaged();;
-        if (limit <= 0) {
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        if (limit > 0) {
             pageable = PageRequest.of(0, limit);
         }
 
-        List<Thesis> filteredThesisList = thesisRepo.findBySearchQuery(word, keywords, subjects, universities, institutes, users, languages, types, author, dateDesc, pageable);
+        List<Thesis> filteredThesisList = thesisRepo.findBySearchQuery(word, keywords, subjects, universities, institutes, users, languages, types, author, pageable);
 
         List<String> filtered = new ArrayList<>();
         if (word != null && !word.isEmpty()) filtered.add("word");

@@ -23,10 +23,7 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
             "AND (:users IS NULL OR t.author.userId IN :users) " +
             "AND (:languages IS NULL OR t.language.thesisLanguageId IN :languages) " +
             "AND (:types IS NULL OR t.type.thesisTypeId IN :types)" +
-            "AND (:author IS NULL OR t.author = :author)" +
-            "ORDER BY " +
-            "CASE WHEN :reversed = true THEN t.submissionDate ELSE 0 END DESC NULLS LAST, " +
-            "CASE WHEN :reversed = false THEN t.submissionDate ELSE 0 END ASC NULLS FIRST")
+            "AND (:author IS NULL OR t.author = :author)")
     List<Thesis> findBySearchQuery(
             @Param("word") String word,
             @Param("keywords") List<Integer> keywords,
@@ -37,7 +34,6 @@ public interface ThesisRepository extends JpaRepository<Thesis, Integer> {
             @Param("languages") List<Integer> languages,
             @Param("types") List<Integer> types,
             @Param("author") User author,
-            @Param("reversed") boolean reversed,
             Pageable pageable
     );
 
