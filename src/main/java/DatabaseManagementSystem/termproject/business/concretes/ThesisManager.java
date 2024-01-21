@@ -110,33 +110,37 @@ public class ThesisManager implements ThesisService {
                     coSupervisor.getUserId());
         }
 
+        return saveNewThesis(
+                Thesis.builder()
+                        .thesisNo(model.getThesisNo())
+                        .subjects(subjects)
+                        .title(model.getTitle())
+                        .thesisAbstract(model.getThesisAbstract())
+                        .year(model.getYear())
+                        .university((University) universityResult.getData())
+                        .institute((Institute) instituteResult.getData())
+                        .numberOfPages(model.getNumberOfPages())
+                        .relatedKeywords((List<RelatedKeyword>) relatedKeywordsResult.getData())
+                        .type((ThesisType) typeResult.getData())
+                        .language((ThesisLanguage) languageResult.getData())
+                        .author((User) userResult.getData())
+                        .supervisor((User) supervisorResult.getData())
+                        .coSupervisor((User) coSupervisorResult.getData())
+                        .build()
+        );
+
+    }
+
+    @Override
+    public Result saveNewThesis(Thesis thesis) {
         try {
-            thesisRepo.save(
-                    Thesis.builder()
-                            .thesisNo(model.getThesisNo())
-                            .subjects(subjects)
-                            .title(model.getTitle())
-                            .thesisAbstract(model.getThesisAbstract())
-                            .year(model.getYear())
-                            .university((University) universityResult.getData())
-                            .institute((Institute) instituteResult.getData())
-                            .numberOfPages(model.getNumberOfPages())
-                            .relatedKeywords((List<RelatedKeyword>) relatedKeywordsResult.getData())
-                            .type((ThesisType) typeResult.getData())
-                            .language((ThesisLanguage) languageResult.getData())
-                            .author((User) userResult.getData())
-                            .supervisor((User) supervisorResult.getData())
-                            .coSupervisor((User) coSupervisorResult.getData())
-                            .build()
-            );
+            thesisRepo.save(thesis);
         } catch (DataIntegrityViolationException e) {
-            return new ErrorResult("Thesis-No exists: " + model.getThesisNo());
+            return new ErrorResult("Thesis-No exists: " + thesis.getThesisNo());
         } catch (Exception e) {
             return new ErrorResult("Unexpected Error Occurred: " + e.getMessage());
         }
-
         return new SuccessResult("Thesis created");
-
     }
 
     @Override
@@ -321,6 +325,8 @@ public class ThesisManager implements ThesisService {
                                                            boolean isOwned,
                                                            boolean dateDesc,
                                                            int limit) {
+
+        if (word != null) { word = word.toLowerCase(); }
 
         User author = null;
         if (isOwned) {

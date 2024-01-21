@@ -12,6 +12,7 @@ public interface ThesisService {
     DataResult<List<Thesis>> getAllThesisByUser();
     DataResult<Thesis> getThesisById(int thesisId);
     Result saveNewThesis(ThesisModel model);
+    Result saveNewThesis(Thesis thesis);
     Result deleteById(int thesisId);
     Result deleteThesisOwnByUser(int thesisId);
     Result addSubjectToThesisByOwner(int thesisId, int subjectId);
